@@ -1,52 +1,58 @@
 import React, { useState, useEffect } from "react";
 import { Container, Form, Button } from "react-bootstrap";
-import "../PagesCss/Contact.css"; // Ensure this path is correct
-import { getContacts, postContacts } from "../../API/AxiosService.js";
+import "../PagesCss/Contact.css";
+import { getContacts, postContacts, deleteContact } from "../../API/AxiosService.js";
 
 function Contact() {
-  const [users, setUsers] = useState([]); // State for storing user data
-  const [name, setName] = useState(""); // State for name input
-  const [email, setEmail] = useState(""); // State for email input
-  const [phone, setPhone] = useState(""); // State for phone input
+  const [users, setUsers] = useState([]);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
 
-  // Fetching contacts on component mount
   useEffect(() => {
     fetchContacts();
   }, []);
 
-  // Function to fetch contacts from the server
   const fetchContacts = async () => {
     try {
-        const response = await getContacts();
-        console.log('response', response.data); // Logging the response for debugging
-        setUsers(response.data.data); // Setting the fetched data to the state
+      const response = await getContacts();
+      setUsers(response.data || []);
     } catch (error) {
-        console.error('Error fetching contacts', error); // Logging any errors
+      console.error('Error fetching contacts', error);
+      setUsers([]);
     }
   };
 
-  // Function to add a contact
   const addContact = async () => {
     try {
-      const response = await postContacts({
-        name,
-        email,
-        phone,
-      });
-      console.log('response', response.data); // Logging the response for debugging
-      reset(); // Clearing the form
-      alert(response.data.message); // Displaying success message
-      fetchContacts(); // Refreshing the contact list
+      const response = await postContacts({ name, email, phone });
+      if (response && response.data) {
+        alert(response.data.message); // Ensure response.data.message exists
+        reset();
+        fetchContacts();
+      } else {
+        console.error('Unexpected response:', response);
+        alert('Failed to add contact. Please try again.');
+      }
     } catch (error) {
-      console.error('Error adding contact', error); // Logging any errors
+      console.error('Error adding contact', error);
+      alert('Failed to add contact. Please try again.');
     }
   };
 
-  // Function to reset form inputs
   const reset = () => {
     setName("");
     setEmail("");
     setPhone("");
+  };
+
+  const handleDelete = async (userId) => {
+    try {
+      await deleteContact(userId);
+      fetchContacts();
+    } catch (error) {
+      console.error('Error deleting contact', error);
+    }
   };
 
   return (
@@ -54,7 +60,7 @@ function Contact() {
       <h1>Contact Me</h1>
       <div className="form-container">
         <Form>
-          <Form.Group className="nameRow" controlId="exampleForm.name">
+          <Form.Group controlId="exampleForm.name">
             <Form.Label>Name</Form.Label>
             <Form.Control
               type="text"
@@ -63,7 +69,7 @@ function Contact() {
               onChange={(e) => setName(e.target.value)}
             />
           </Form.Group>
-          <Form.Group className="emailRow" controlId="exampleForm.email">
+          <Form.Group controlId="exampleForm.email">
             <Form.Label>Email</Form.Label>
             <Form.Control
               type="email"
@@ -72,7 +78,7 @@ function Contact() {
               onChange={(e) => setEmail(e.target.value)}
             />
           </Form.Group>
-          <Form.Group className="phoneRow" controlId="exampleForm.phone">
+          <Form.Group controlId="exampleForm.phone">
             <Form.Label>Phone</Form.Label>
             <Form.Control
               type="tel"
@@ -102,6 +108,9 @@ function Contact() {
                 <p><strong>Name:</strong> {user.name}</p>
                 <p><strong>Email:</strong> {user.email}</p>
                 <p><strong>Phone:</strong> {user.phone}</p>
+                <Button variant="danger" onClick={() => handleDelete(user._id)}>
+                  Delete
+                </Button>
               </li>
             ))}
           </ul>

@@ -7,8 +7,13 @@ const getContacts = async () => {
 
 // Function to post new contact
 const postContacts = async (data) => {
-  return await axios.post("http://localhost:5000/submit-form", data);
+  return await axios.post("http://localhost:5000/contacts", data);
+};
+
+// Function to delete a contact
+const deleteContact = async (id) => {
+  return await axios.delete(`http://localhost:5000/contacts/${id}`);
 };
 
 // Exporting functions for use in other files
-export { getContacts, postContacts };
+export { getContacts, postContacts, deleteContact };
