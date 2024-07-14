@@ -15,5 +15,9 @@ const deleteContact = async (id) => {
   return await axios.delete(`http://localhost:5000/contacts/${id}`);
 };
 
+const putContact = async (id, data) => {
+    return await axios.put(`http://localhost:5000/contacts/${id}`, data);
+  };
+  
 // Exporting functions for use in other files
-export { getContacts, postContacts, deleteContact };
+export { getContacts, postContacts, deleteContact, putContact };
