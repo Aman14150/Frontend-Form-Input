@@ -1,38 +1,60 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Container, Form, Button } from "react-bootstrap";
+import "../PagesCss/Contact.css"; // Ensure this path is correct
+import { getContacts, postContacts } from "../../API/AxiosService.js";
 
 function Contact() {
-  const [users, setUsers] = useState([]);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
+  const [users, setUsers] = useState([]); // State for storing user data
+  const [name, setName] = useState(""); // State for name input
+  const [email, setEmail] = useState(""); // State for email input
+  const [phone, setPhone] = useState(""); // State for phone input
 
-  const addUser = () => {
-    const newUser = { name, email, phone };
-    setUsers([...users, newUser]);
-    // Clear form after submission
-    setName("");
-    setEmail("");
-    setPhone("");
+  // Fetching contacts on component mount
+  useEffect(() => {
+    fetchContacts();
+  }, []);
+
+  // Function to fetch contacts from the server
+  const fetchContacts = async () => {
+    try {
+        const response = await getContacts();
+        console.log('response', response.data); // Logging the response for debugging
+        setUsers(response.data.data); // Setting the fetched data to the state
+    } catch (error) {
+        console.error('Error fetching contacts', error); // Logging any errors
+    }
   };
 
+  // Function to add a contact
+  const addContact = async () => {
+    try {
+      const response = await postContacts({
+        name,
+        email,
+        phone,
+      });
+      console.log('response', response.data); // Logging the response for debugging
+      reset(); // Clearing the form
+      alert(response.data.message); // Displaying success message
+      fetchContacts(); // Refreshing the contact list
+    } catch (error) {
+      console.error('Error adding contact', error); // Logging any errors
+    }
+  };
+
+  // Function to reset form inputs
   const reset = () => {
     setName("");
     setEmail("");
     setPhone("");
   };
 
-  const deleteUser = (userId) => {
-    const updatedUsers = users.filter((user) => user._id !== userId);
-    setUsers(updatedUsers);
-  };
-
   return (
-    <Container className="container">
+    <Container className="custom-container">
       <h1>Contact Me</h1>
-      <div>
+      <div className="form-container">
         <Form>
-          <Form.Group className="mb-3" controlId="exampleForm.name">
+          <Form.Group className="nameRow" controlId="exampleForm.name">
             <Form.Label>Name</Form.Label>
             <Form.Control
               type="text"
@@ -41,7 +63,7 @@ function Contact() {
               onChange={(e) => setName(e.target.value)}
             />
           </Form.Group>
-          <Form.Group className="mb-3" controlId="exampleForm.email">
+          <Form.Group className="emailRow" controlId="exampleForm.email">
             <Form.Label>Email</Form.Label>
             <Form.Control
               type="email"
@@ -50,7 +72,7 @@ function Contact() {
               onChange={(e) => setEmail(e.target.value)}
             />
           </Form.Group>
-          <Form.Group className="mb-3" controlId="exampleForm.phone">
+          <Form.Group className="phoneRow" controlId="exampleForm.phone">
             <Form.Label>Phone</Form.Label>
             <Form.Control
               type="tel"
@@ -59,27 +81,27 @@ function Contact() {
               onChange={(e) => setPhone(e.target.value)}
             />
           </Form.Group>
+
+          <div className="button-group">
+            <Button variant="primary" onClick={addContact}>
+              Submit
+            </Button>{' '}
+            <Button variant="secondary" onClick={reset}>
+              Clear
+            </Button>{' '}
+          </div>
         </Form>
       </div>
-      <div>
-        <Button variant="primary" onClick={addUser}>
-          Submit
-        </Button>
-        <Button variant="secondary" onClick={reset}>
-          Clear
-        </Button>
-      </div>
+
       {users.length > 0 && (
-        <div>
-          <ul>
-            {users.map((user) => (
-              <li key={user._id}>
-                <p>Name: {user.name}</p>
-                <p>Email: {user.email}</p>
-                <p>Phone: {user.phone}</p>
-                <Button variant="danger" onClick={() => deleteUser(user._id)}>
-                  Delete
-                </Button>
+        <div className="users-container">
+          <h2>Users List</h2>
+          <ul className="users-list">
+            {users.map((user, index) => (
+              <li key={index} className="user-item">
+                <p><strong>Name:</strong> {user.name}</p>
+                <p><strong>Email:</strong> {user.email}</p>
+                <p><strong>Phone:</strong> {user.phone}</p>
               </li>
             ))}
           </ul>

@@ -1,43 +1,69 @@
-/* contact.css */
-
-.container {
+.custom-container {
   max-width: 1000px;
-  margin-top: 0px;
-  margin: 0 auto;
+  margin: 20px auto;
   padding: 20px;
-  /* border: 1px solid #ccc; */
-  border-radius: 5px;
-  background-color: #ca7c7c;
+  border-radius: 8px;
+  background-color: #4382e1;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
 }
 
-h1{
-    margin-top: 0px;
+.form-container {
+  background-color: #cfcffc;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-.form-group {
-  margin-bottom: 15px;
+.nameRow {
+  padding: 10px;
+}
+.emailRow {
+  padding: 10px;
+}
+.phoneRow {
+  padding: 10px;
+}
+.button-group {
+  display: flex;
+  margin: 10px;
 }
 
-.btn-primary {
-  margin-right: 10px;
+button {
+  padding: 10px;
+  margin: 10px;
+}
+.users-container {
+  margin-top: 20px;
 }
 
-.btn-secondary {
-  margin-left: 10px;
-}
-
-ul {
+.users-list {
   list-style-type: none;
   padding: 0;
 }
 
-li {
+.user-item {
+  background-color: #ffffff;
+  padding: 15px;
   margin-bottom: 10px;
-  padding: 10px;
-
-  border-radius: 5px;
+  border-radius: 8px;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-li p {
-  margin: 0;
+.user-item p {
+  margin: 5px 0;
+}
+
+@media (max-width: 768px) {
+  .custom-container {
+    padding: 15px;
+  }
+}
+
+@media (min-width: 320px) and (max-width: 576px) {
+  .custom-container {
+    padding: 10px;
+  }
+  .nameRow, .emailRow, .phoneRow {
+    padding: 0;
+  }
 }
