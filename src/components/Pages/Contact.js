@@ -14,7 +14,7 @@ function Contact() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [editMode, setEditMode] = useState(false);
-  const [editId, setEditId] = useState(null); 
+  const [editId, setEditId] = useState(null);
 
   useEffect(() => {
     fetchContacts();
@@ -38,7 +38,7 @@ function Contact() {
       if (response && response.data) {
         alert(response.data.message);
         reset();
-        fetchContacts(); 
+        fetchContacts();
         // const newContact = response.data.newContact;
         // setUsers(prevUsers => [...prevUsers, newContact]);
       } else {
@@ -68,6 +68,25 @@ function Contact() {
     }
   };
 
+  // Update a contact
+  const updateContactHandler = async () => {
+    try {
+      const updatedContact = { name, email, phone };
+      const response = await putContact(editId, updatedContact);
+      alert(response.data.message);
+      reset();
+      fetchContacts();
+      // setUsers(prevUsers => prevUsers.map(user =>
+      //   user._id === editId ? { ...user, name, email, phone } : user
+      // ));
+      setEditMode(false);
+      setEditId(null);
+    } catch (error) {
+      console.error("Error updating contact", error);
+      alert("Failed to update contact. Please try again.");
+    }
+  };
+
   // Edit a contact
   const handleEdit = (userId) => {
     let userToEdit = null;
@@ -85,25 +104,6 @@ function Contact() {
       setEditId(userId);
     } else {
       console.error("User with ID " + userId + " not found.");
-    }
-  };
-
-  // Update a contact
-  const updateContactHandler = async () => {
-    try {
-      const updatedContact = { name, email, phone };
-      const response = await putContact(editId, updatedContact);
-      alert(response.data.message);
-      reset();
-      fetchContacts(); // Refresh the contacts list
-      // setUsers(prevUsers => prevUsers.map(user =>
-      //   user._id === editId ? { ...user, name, email, phone } : user
-      // ));
-      setEditMode(false);
-      setEditId(null);
-    } catch (error) {
-      console.error("Error updating contact", error);
-      alert("Failed to update contact. Please try again.");
     }
   };
 
@@ -134,7 +134,7 @@ function Contact() {
             <Form.Label>Phone</Form.Label>
             <Form.Control
               type="tel"
-                pattern="[0-9]*"
+              pattern="[0-9]*"
               placeholder="Enter your phone number"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
