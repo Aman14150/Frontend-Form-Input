@@ -24,7 +24,7 @@ function Contact() {
   const fetchContacts = async () => {
     try {
       const response = await getContacts();
-      console.log("Fetched contacts:", response.data); 
+      console.log("Fetched contacts:", response.data);
       setUsers(response.data || []);
     } catch (error) {
       console.error("Error fetching contacts", error);
@@ -34,25 +34,21 @@ function Contact() {
 
   // Add a new contact
   const addContact = async () => {
-    const confirmSubmit = window.confirm("Are you sure you want to add this contact?");
-    if (confirmSubmit) {
-      try {
-        const response = await postContacts({ name, email, phone });
-        console.log("Add contact response:", response.data); 
-        if (response && response.data) {
-          alert(response.data.message);
-          reset();
-          fetchContacts();
-        } else {
-          console.error("Unexpected response:", response);
-          alert("Failed to add contact. Please try again.");
-        }
-      } catch (error) {
-        console.error("Error adding contact", error);
+    try {
+      const response = await postContacts({ name, email, phone });
+      if (response && response.data) {
+        alert(response.data.message);
+        reset();
+        fetchContacts();
+        // const newContact = response.data.newContact;
+        // setUsers(prevUsers => [...prevUsers, newContact]);
+      } else {
+        console.error("Unexpected response:", response);
         alert("Failed to add contact. Please try again.");
       }
-    } else {
-      console.log("Addition canceled");
+    } catch (error) {
+      console.error("Error adding contact", error);
+      alert("Failed to add contact. Please try again.");
     }
   };
 
@@ -70,11 +66,13 @@ function Contact() {
       try {
         await deleteContact(userId);
         console.log("Deleted user ID:", userId); // Log deleted user ID
-        setUsers((prevUsers) => prevUsers.filter((user) => user._id !== userId));
-        alert("Contact deleted successfully"); 
+        setUsers((prevUsers) =>
+          prevUsers.filter((user) => user._id !== userId)
+        );
+        alert("Contact deleted successfully");
       } catch (error) {
         console.error("Error deleting contact", error);
-        alert("Failed to delete contact. Please try again."); 
+        alert("Failed to delete contact. Please try again.");
       }
     } else {
       console.log("Deletion canceled");
@@ -82,24 +80,22 @@ function Contact() {
   };
 
   // Update a contact
+  // Update a contact
   const updateContactHandler = async () => {
-    const confirmSubmit = window.confirm("Are you sure you want to update this contact?");
-    if (confirmSubmit) {
-      try {
-        const updatedContact = { name, email, phone };
-        const response = await putContact(editId, updatedContact);
-        console.log("Update contact response:", response.data); 
-        alert(response.data.message);
-        reset();
-        fetchContacts();
-        setEditMode(false);
-        setEditId(null);
-      } catch (error) {
-        console.error("Error updating contact", error);
-        alert("Failed to update contact. Please try again.");
-      }
-    } else {
-      console.log("Update canceled");
+    try {
+      const updatedContact = { name, email, phone };
+      const response = await putContact(editId, updatedContact);
+      alert(response.data.message);
+      reset();
+      fetchContacts();
+      // setUsers(prevUsers => prevUsers.map(user =>
+      //   user._id === editId ? { ...user, name, email, phone } : user
+      // ));
+      setEditMode(false);
+      setEditId(null);
+    } catch (error) {
+      console.error("Error updating contact", error);
+      alert("Failed to update contact. Please try again.");
     }
   };
 
