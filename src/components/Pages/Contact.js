@@ -65,7 +65,7 @@ function Contact() {
     if (confirmDelete) {
       try {
         await deleteContact(userId);
-        console.log("Deleted user ID:", userId); // Log deleted user ID
+        console.log("Deleted user ID:", userId);
         setUsers((prevUsers) =>
           prevUsers.filter((user) => user._id !== userId)
         );
@@ -79,7 +79,6 @@ function Contact() {
     }
   };
 
-  // Update a contact
   // Update a contact
   const updateContactHandler = async () => {
     try {
