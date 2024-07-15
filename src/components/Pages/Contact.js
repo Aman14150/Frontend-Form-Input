@@ -13,13 +13,14 @@ function Contact() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [editMode, setEditMode] = useState(false); // State to track edit mode
-  const [editId, setEditId] = useState(null); // State to track which user ID is being edited
+  const [editMode, setEditMode] = useState(false);
+  const [editId, setEditId] = useState(null); 
 
   useEffect(() => {
     fetchContacts();
   }, []);
 
+  // Fetch all contacts
   const fetchContacts = async () => {
     try {
       const response = await getContacts();
@@ -30,13 +31,16 @@ function Contact() {
     }
   };
 
+  // Add a new contact
   const addContact = async () => {
     try {
       const response = await postContacts({ name, email, phone });
       if (response && response.data) {
-        alert(response.data.message); // Ensure response.data.message exists
+        alert(response.data.message);
         reset();
-        fetchContacts();
+        fetchContacts(); 
+        // const newContact = response.data.newContact;
+        // setUsers(prevUsers => [...prevUsers, newContact]);
       } else {
         console.error("Unexpected response:", response);
         alert("Failed to add contact. Please try again.");
@@ -47,46 +51,59 @@ function Contact() {
     }
   };
 
+  // Reset form fields
   const reset = () => {
     setName("");
     setEmail("");
     setPhone("");
   };
 
+  // Delete a contact
   const handleDelete = async (userId) => {
     try {
       await deleteContact(userId);
-      fetchContacts();
+      setUsers((prevUsers) => prevUsers.filter((user) => user._id !== userId));
     } catch (error) {
       console.error("Error deleting contact", error);
     }
   };
 
+  // Edit a contact
   const handleEdit = (userId) => {
-    const userToEdit = users.find(user => user._id === userId);
-    if (userToEdit) {
-      setName(userToEdit.name); // Set name field with user's current name
-      setEmail(userToEdit.email); // Set email field with user's current email
-      setPhone(userToEdit.phone); // Set phone field with user's current phone
-      setEditMode(true); // Enable edit mode
-      setEditId(userId); // Set the ID of the user being edited
+    let userToEdit = null;
+    for (let i = 0; i < users.length; i++) {
+      if (users[i]._id === userId) {
+        userToEdit = users[i];
+        break;
+      }
+    }
+    if (userToEdit !== null) {
+      setName(userToEdit.name);
+      setEmail(userToEdit.email);
+      setPhone(userToEdit.phone);
+      setEditMode(true);
+      setEditId(userId);
     } else {
-      console.error(`User with ID ${userId} not found.`);
+      console.error("User with ID " + userId + " not found.");
     }
   };
 
+  // Update a contact
   const updateContactHandler = async () => {
     try {
       const updatedContact = { name, email, phone };
       const response = await putContact(editId, updatedContact);
-      alert(response.data.message); // Assuming backend sends a message on success
+      alert(response.data.message);
       reset();
-      fetchContacts();
-      setEditMode(false); // Disable edit mode after update
-      setEditId(null); // Clear edit ID
+      fetchContacts(); // Refresh the contacts list
+      // setUsers(prevUsers => prevUsers.map(user =>
+      //   user._id === editId ? { ...user, name, email, phone } : user
+      // ));
+      setEditMode(false);
+      setEditId(null);
     } catch (error) {
-      console.error('Error updating contact', error);
-      alert('Failed to update contact. Please try again.');
+      console.error("Error updating contact", error);
+      alert("Failed to update contact. Please try again.");
     }
   };
 
@@ -117,6 +134,7 @@ function Contact() {
             <Form.Label>Phone</Form.Label>
             <Form.Control
               type="tel"
+                pattern="[0-9]*"
               placeholder="Enter your phone number"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
@@ -124,9 +142,11 @@ function Contact() {
           </Form.Group>
 
           <div className="button-group">
-            {/* Update button text based on editMode */}
-            <Button variant="primary" onClick={editMode ? updateContactHandler : addContact}>
-              {editMode ? 'Update' : 'Submit'}
+            <Button
+              variant="primary"
+              onClick={editMode ? updateContactHandler : addContact}
+            >
+              {editMode ? "Update" : "Submit"}
             </Button>{" "}
             <Button variant="secondary" onClick={reset}>
               Clear
