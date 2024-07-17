@@ -15,6 +15,7 @@ function Contact() {
   const [phone, setPhone] = useState("");
   const [editMode, setEditMode] = useState(false);
   const [editId, setEditId] = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchContacts();
@@ -37,11 +38,13 @@ function Contact() {
     try {
       const response = await postContacts({ name, email, phone });
       if (response && response.data) {
-        alert(response.data.message);
-        reset();
-        fetchContacts();
-        // const newContact = response.data.newContact;
-        // setUsers(prevUsers => [...prevUsers, newContact]);
+        if (response.data.error === "DuplicateEmail") {
+          setError("Email already exists. Please use a different email.");
+        } else {
+          alert(response.data.message);
+          reset();
+          fetchContacts();
+        }
       } else {
         console.error("Unexpected response:", response);
         alert("Failed to add contact. Please try again.");
@@ -57,6 +60,7 @@ function Contact() {
     setName("");
     setEmail("");
     setPhone("");
+    setError(null);
   };
 
   // Delete a contact
@@ -123,6 +127,7 @@ function Contact() {
     <Container className="custom-container">
       <h1>Contact Me</h1>
       <div className="form-container">
+      {error && <Alert variant="danger">{error}</Alert>} {/* Display error message */}
         <Form>
           <Form.Group controlId="exampleForm.name">
             <Form.Label>Name</Form.Label>
